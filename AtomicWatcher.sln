@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31313.79
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FFE4425B-4425-49FC-A7E1-E4AC61ECE076}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		GlobalSuppressions.cs = GlobalSuppressions.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomicWatcher", "AtomicWatcher\AtomicWatcher.csproj", "{9E0CCE3D-CB4A-48F3-BAAC-E246B0428D7E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E0CCE3D-CB4A-48F3-BAAC-E246B0428D7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E0CCE3D-CB4A-48F3-BAAC-E246B0428D7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E0CCE3D-CB4A-48F3-BAAC-E246B0428D7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E0CCE3D-CB4A-48F3-BAAC-E246B0428D7E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5CA8CF56-6A5C-4212-BDAD-F71E67FA39AF}
+	EndGlobalSection
+EndGlobal
