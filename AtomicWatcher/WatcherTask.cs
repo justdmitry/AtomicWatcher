@@ -3,10 +3,12 @@
     using System;
     using System.Globalization;
     using System.IO;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using MoreLinq;
     using NetTelegramBotApi;
     using NetTelegramBotApi.Requests;
     using RecurrentTasks;
@@ -60,15 +62,21 @@
 
             logger.LogDebug($"Connected to Telegram as @{me.Username} / #{me.Id}");
 
-            foreach (var sale in sales)
+            var sb = new StringBuilder(1024);
+            foreach (var batch in sales.Batch(7))
             {
-                var text = $@"*{sale.Name}* #{sale.Mint} {sale.RaritySymbol} {sale.Rarity} for *{sale.Price}* WAX
-Sale #[{sale.Id}]({sale.Link}) from `{sale.Seller}`";
+                sb.Clear();
 
-                var msg = new SendMessage(telegramOptions.ChannelName, text) { ParseMode = SendMessage.ParseModeEnum.Markdown, DisableWebPagePreview = true };
+                foreach (var sale in batch)
+                {
+                    sb.AppendLine($@"{sale.RaritySymbol} <b>{sale.Name}</b> #{sale.Mint} <a href='{sale.Link}'>for <b>{sale.Price}</b> WAX</a>");
+                    sb.AppendLine();
+                    lastId = sale.Id;
+                }
+
+                var msg = new SendMessage(telegramOptions.ChannelName, sb.ToString()) { ParseMode = SendMessage.ParseModeEnum.HTML, DisableWebPagePreview = true };
                 var msgResult = await bot.MakeRequestAsync(msg).ConfigureAwait(false);
-                logger.LogDebug($"Msg #{msgResult.MessageId} done: sale #{sale.Id} from {sale.Seller} for {sale.Price}");
-                lastId = sale.Id;
+                logger.LogDebug($"Msg #{msgResult.MessageId} done, last sale ID={lastId}");
             }
 
             if (sales.Count == atomicOptions.PageSize * atomicOptions.MaxPages)
