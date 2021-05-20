@@ -145,7 +145,7 @@
     {
         public string asset_id { get; set; }
         public AssetData data { get; set; }
-        public AssetTemplate template { get;set; }
+        public AssetTemplate template { get; set; }
         public string template_mint { get; set; }
     }
 
