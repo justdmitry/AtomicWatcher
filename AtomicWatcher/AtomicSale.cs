@@ -19,20 +19,11 @@
 
         public long Mint { get; set; }
 
-        public string? RarityCode
-        {
-            get
-            {
-                return Rarity switch
-                {
-                    "Unique" => "Unq",
-                    "Legendary" => "Lgn",
-                    "Uncommon" => "Unc",
-                    "Common" => "Cmn",
-                    _ => Rarity,
-                };
-            }
-        }
+        public long IssuedSupply { get; set; }
+
+        public long MaxSupply { get; set; }
+
+        public int CardId { get; set; }
 
         public string? RaritySymbol
         {
@@ -47,6 +38,38 @@
                     "Uncommon" => Emoji.GreenSquare,
                     "Common" => Emoji.BlueSquare,
                     _ => Emoji.QuestionMark,
+                };
+            }
+        }
+
+        public string? RarityIcon
+        {
+            get
+            {
+                return Rarity switch
+                {
+                    "Legendary" => "https://cdn.discordapp.com/emojis/753660996790255830.png?v=1",
+                    "Epic" => "https://cdn.discordapp.com/emojis/753660996941381753.png?v=1",
+                    "Rare" => "https://cdn.discordapp.com/emojis/753660996928667730.png?v=1",
+                    "Uncommon" => "https://cdn.discordapp.com/emojis/753660997130256385.png?v=1",
+                    "Common" => "https://cdn.discordapp.com/emojis/753660997377589391.png?v=1",
+                    _ => null,
+                };
+            }
+        }
+
+        public uint RarityColor
+        {
+            get
+            {
+                return Rarity switch
+                {
+                    "Rare" => 0x3FD83F,
+                    "Uncommon" => 0x418723,
+                    "Common" => 0x274E13,
+                    "Epic" => 0xC1E841,
+                    "Legendary" => 0xF4F435,
+                    _ => 0,
                 };
             }
         }

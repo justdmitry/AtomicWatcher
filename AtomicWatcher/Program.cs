@@ -26,8 +26,10 @@
                         .AddTransient<AtomicService>();
 
                     services.Configure<TelegramOptions>(hostContext.Configuration.GetSection("TelegramOptions"));
+                    services.Configure<DiscordOptions>(hostContext.Configuration.GetSection("DiscordOptions"));
 
-                    services.AddTask<WatcherTask>(o => o.AutoStart(WatcherTask.Interval, TimeSpan.FromSeconds(3)));
+                    services.AddTask<CardImageFinderTask>(o => o.AutoStart(CardImageFinderTask.Interval, TimeSpan.FromSeconds(3)));
+                    services.AddTask<WatcherTask>(o => o.AutoStart(WatcherTask.Interval, TimeSpan.FromSeconds(15)));
                 });
     }
 }

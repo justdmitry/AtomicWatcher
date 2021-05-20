@@ -101,8 +101,11 @@
                     Name = x.assets[0].data.name,
                     Rarity = x.assets[0].data.rarity,
                     Seller = x.seller,
+                    CardId = int.Parse(x.assets[0].data?.card_id ?? "0", CultureInfo.InvariantCulture),
                     Price = decimal.Parse(x.price.amount, CultureInfo.InvariantCulture) / (decimal)Math.Pow(10, x.price.token_precision),
                     Mint = long.Parse(x.assets[0].template_mint, CultureInfo.InvariantCulture),
+                    IssuedSupply = long.Parse(x.assets[0].template.issued_supply, CultureInfo.InvariantCulture),
+                    MaxSupply = long.Parse(x.assets[0].template.max_supply, CultureInfo.InvariantCulture),
                 })
                 .ToList();
 
@@ -142,6 +145,7 @@
     {
         public string asset_id { get; set; }
         public AssetData data { get; set; }
+        public AssetTemplate template { get;set; }
         public string template_mint { get; set; }
     }
 
@@ -150,5 +154,11 @@
         public string card_id { get; set; }
         public string name { get; set; }
         public string rarity { get; set; }
+    }
+
+    public class AssetTemplate
+    {
+        public string issued_supply { get; set; }
+        public string max_supply { get; set; }
     }
 }
