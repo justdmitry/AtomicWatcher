@@ -92,7 +92,7 @@
 
                 foreach (var sale in batch)
                 {
-                    sb.AppendLine($@"{sale.RaritySymbol} <b>{sale.Name}</b> #{sale.Mint} <a href='{sale.Link}'>for <b>{sale.Price}</b> WAX</a>");
+                    sb.AppendLine($@"№{sale.CardId} {sale.RaritySymbol} <b>{sale.Name}</b> #{sale.Mint} <a href='{sale.Link}'>for <b>{sale.Price}</b> WAX</a>");
                     sb.AppendLine();
                 }
 
