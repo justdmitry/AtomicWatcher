@@ -128,7 +128,7 @@
                 foreach (var sale in batch)
                 {
                     var eb = new EmbedBuilder()
-                        .WithAuthor(sale.Name, sale.RarityIcon)
+                        .WithAuthor($"{sale.Name} (№{sale.CardId})", sale.RarityIcon)
                         .WithColor(sale.RarityColor)
                         .WithTimestamp(sale.Created)
                         .WithFooter("Made with ♥ and potassium");
