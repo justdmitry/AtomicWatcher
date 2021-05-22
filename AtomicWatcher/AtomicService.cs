@@ -68,10 +68,8 @@
 
             var reqText = System.Text.Json.JsonSerializer.Serialize(reqData);
 
-            using var req = new HttpRequestMessage(HttpMethod.Post, "https://wax.api.aa.atomichub.io/atomicmarket/v1/sales");
+            using var req = new HttpRequestMessage(HttpMethod.Post, "https://wax.api.atomicassets.io/atomicmarket/v1/sales");
             req.Content = new StringContent(reqText, Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json);
-            req.Headers.Add("Referer", "https://wax.atomichub.io/");
-            req.Headers.Add("Origin", "https://wax.atomichub.io/");
 
             using var client = httpClientFactory.CreateClient();
 
