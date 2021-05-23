@@ -6,21 +6,56 @@
     using System.Linq;
     using System.Net.Http;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
+    using AtomicWatcher.Data;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using RecurrentTasks;
 
-    public class AtomicService
+    public class AtomicLoaderTask : IRunnable
     {
+        public static readonly TimeSpan Interval = TimeSpan.FromSeconds(30);
+
         private readonly ILogger logger;
         private readonly AtomicOptions options;
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly IDbProvider dbProvider;
 
-        public AtomicService(ILogger<AtomicService> logger, IOptions<AtomicOptions> options, IHttpClientFactory httpClientFactory)
+        public AtomicLoaderTask(ILogger<AtomicLoaderTask> logger, IOptions<AtomicOptions> options, IHttpClientFactory httpClientFactory, IDbProvider dbProvider)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            this.dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
+        }
+
+        public async Task RunAsync(ITask currentTask, IServiceProvider scopeServiceProvider, CancellationToken cancellationToken)
+        {
+            var settings = dbProvider.Settings;
+            var set = settings.FindOne(x => x.Id == Setting.AtomicLastSaleId);
+
+            var lastId = set?.LongValue ?? 0;
+            var sales = await GetNewSales(lastId).ConfigureAwait(false);
+
+            if (sales.Count == 0)
+            {
+                logger.LogInformation("No new sales found");
+                return;
+            }
+
+            lastId = sales.Max(x => x.Id);
+
+            foreach (var sale in sales)
+            {
+                dbProvider.AtomicSales.Upsert(sale);
+                dbProvider.AtomicSalesTelegramQueue.Upsert(sale);
+                dbProvider.AtomicSalesDiscordQueue.Upsert(sale);
+            }
+
+            settings.Upsert(new Setting(Setting.AtomicLastSaleId) { LongValue = lastId });
+
+            logger.LogInformation($"Saved {sales.Count} new sales");
         }
 
         public async Task<List<AtomicSale>> GetNewSales(long lastId)
@@ -48,6 +83,8 @@
                     break;
                 }
             }
+
+            logger.LogDebug($"Found {res.Count} new sales for collection '{options.Collection}' after lastId={lastId}.");
 
             return res;
         }

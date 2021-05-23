@@ -1,7 +1,8 @@
-﻿namespace AtomicWatcher
+﻿namespace AtomicWatcher.Data
 {
     using System;
     using System.Text;
+    using LiteDB;
 
     public class AtomicSale
     {
@@ -25,6 +26,7 @@
 
         public int CardId { get; set; }
 
+        [BsonIgnore]
         public string? RaritySymbol
         {
             get
@@ -42,6 +44,7 @@
             }
         }
 
+        [BsonIgnore]
         public string? RarityIcon
         {
             get
@@ -58,6 +61,7 @@
             }
         }
 
+        [BsonIgnore]
         public uint RarityColor
         {
             get
@@ -74,6 +78,7 @@
             }
         }
 
+        [BsonIgnore]
         public string Link
         {
             get
