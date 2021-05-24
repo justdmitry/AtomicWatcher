@@ -10,6 +10,10 @@
 
         ILiteCollection<AtomicSale> AtomicSalesDiscordQueue { get; }
 
+        ILiteCollection<AtomicSale> AtomicSalesAnalysisQueue { get; }
+
+        ILiteCollection<WaxAccount> WaxAccounts { get; }
+
         ILiteCollection<Setting> Settings { get; }
     }
 }

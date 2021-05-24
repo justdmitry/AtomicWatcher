@@ -18,13 +18,17 @@
 
         public DateTimeOffset Created { get; set; }
 
-        public long Mint { get; set; }
+        public int Mint { get; set; }
 
-        public long IssuedSupply { get; set; }
+        public int IssuedSupply { get; set; }
 
-        public long MaxSupply { get; set; }
+        public int MaxSupply { get; set; }
 
         public int CardId { get; set; }
+
+        public int TemplateId { get; set; }
+
+        public long AssetId { get; set; }
 
         [BsonIgnore]
         public string? RaritySymbol

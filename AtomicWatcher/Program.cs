@@ -38,6 +38,11 @@
                     services
                         .Configure<DiscordOptions>(hostContext.Configuration.GetSection("DiscordOptions"))
                         .AddTask<DiscordPublisherTask>(o => o.AutoStart(DiscordPublisherTask.Interval));
+
+                    services
+                        .Configure<WaxAccountUpdaterOptions>(hostContext.Configuration.GetSection("WaxAccountUpdaterOptions"))
+                        .AddTask<WaxAccountUpdaterTask>(o => o.AutoStart(WaxAccountUpdaterTask.DefaultInterval))
+                        .AddTask<AnalyzerTask>(o => o.AutoStart(AnalyzerTask.Interval));
                 });
     }
 }

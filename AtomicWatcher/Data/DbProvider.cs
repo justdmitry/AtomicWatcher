@@ -6,6 +6,7 @@
 
     public class DbProvider : IDbProvider
     {
+        private readonly object syncRoot = new object();
         private readonly DbOptions options;
 
         private LiteDatabase? db;
@@ -21,19 +22,32 @@
 
         public ILiteCollection<AtomicSale> AtomicSalesDiscordQueue => this.GetDb().GetCollection<AtomicSale>("AtomicSalesDiscordQueue");
 
+        public ILiteCollection<AtomicSale> AtomicSalesAnalysisQueue => this.GetDb().GetCollection<AtomicSale>("AtomicSalesAnalysisQueue");
+
+        public ILiteCollection<WaxAccount> WaxAccounts => this.GetDb().GetCollection<WaxAccount>("WaxAccounts");
+
         public ILiteCollection<Setting> Settings => this.GetDb().GetCollection<Setting>("Settings");
 
         public LiteDatabase GetDb()
         {
             if (db == null)
             {
-                db = new LiteDatabase(options.Path);
+                lock (syncRoot)
+                {
+                    if (db == null)
+                    {
+                        db = new LiteDatabase(options.Path);
 
-                var sales = db.GetCollection<AtomicSale>("AtomicSales");
-                sales.EnsureIndex(x => x.CardId);
+                        var sales = db.GetCollection<AtomicSale>("AtomicSales");
+                        sales.EnsureIndex(x => x.CardId);
 
-                var settings = db.GetCollection<Setting>("Settings");
-                settings.EnsureIndex(x => x.Id, true);
+                        var settings = db.GetCollection<Setting>("Settings");
+                        settings.EnsureIndex(x => x.Id, true);
+
+                        var waxAcc = db.GetCollection<WaxAccount>("WaxAccounts");
+                        waxAcc.EnsureIndex(x => x.IsActive);
+                    }
+                }
             }
 
             return db;

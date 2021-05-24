@@ -4,8 +4,8 @@
     {
         public string Collection { get; set; } = "none";
 
-        public uint PageSize { get; set; } = 20;
+        public uint SalesPageSize { get; set; } = 20;
 
-        public uint MaxPages { get; set; } = 5;
+        public uint SalesMaxPages { get; set; } = 5;
     }
 }

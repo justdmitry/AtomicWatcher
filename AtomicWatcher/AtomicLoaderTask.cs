@@ -21,13 +21,15 @@
         private readonly AtomicOptions options;
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IDbProvider dbProvider;
+        private readonly ITask analyzerTask;
 
-        public AtomicLoaderTask(ILogger<AtomicLoaderTask> logger, IOptions<AtomicOptions> options, IHttpClientFactory httpClientFactory, IDbProvider dbProvider)
+        public AtomicLoaderTask(ILogger<AtomicLoaderTask> logger, IOptions<AtomicOptions> options, IHttpClientFactory httpClientFactory, IDbProvider dbProvider, ITask<AnalyzerTask> analyzerTask)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             this.dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
+            this.analyzerTask = analyzerTask ?? throw new ArgumentNullException(nameof(analyzerTask));
         }
 
         public async Task RunAsync(ITask currentTask, IServiceProvider scopeServiceProvider, CancellationToken cancellationToken)
@@ -51,11 +53,14 @@
                 dbProvider.AtomicSales.Upsert(sale);
                 dbProvider.AtomicSalesTelegramQueue.Upsert(sale);
                 dbProvider.AtomicSalesDiscordQueue.Upsert(sale);
+                dbProvider.AtomicSalesAnalysisQueue.Upsert(sale);
             }
 
             settings.Upsert(new Setting(Setting.AtomicLastSaleId) { LongValue = lastId });
 
             logger.LogInformation($"Saved {sales.Count} new sales");
+
+            analyzerTask.TryRunImmediately();
         }
 
         public async Task<List<AtomicSale>> GetNewSales(long lastId)
@@ -64,7 +69,7 @@
 
             var res = new List<AtomicSale>();
 
-            for (var page = 1; page < options.MaxPages; page++)
+            for (var page = 1; page < options.SalesMaxPages; page++)
             {
                 var batch = await GetSales(page).ConfigureAwait(false);
                 if (lastId == 0)
@@ -95,7 +100,7 @@
             {
                 state = "1",
                 max_assets = "1", // exclude bundles
-                limit = options.PageSize.ToString(CultureInfo.InvariantCulture),
+                limit = options.SalesPageSize.ToString(CultureInfo.InvariantCulture),
                 page = page.ToString(CultureInfo.InvariantCulture),
                 order = "desc",
                 sort = "created",
@@ -138,9 +143,11 @@
                     Seller = x.seller,
                     CardId = int.Parse(x.assets[0].data?.card_id ?? "0", CultureInfo.InvariantCulture),
                     Price = decimal.Parse(x.price.amount, CultureInfo.InvariantCulture) / (decimal)Math.Pow(10, x.price.token_precision),
-                    Mint = long.Parse(x.assets[0].template_mint, CultureInfo.InvariantCulture),
-                    IssuedSupply = long.Parse(x.assets[0].template.issued_supply, CultureInfo.InvariantCulture),
-                    MaxSupply = long.Parse(x.assets[0].template.max_supply, CultureInfo.InvariantCulture),
+                    Mint = int.Parse(x.assets[0].template_mint, CultureInfo.InvariantCulture),
+                    IssuedSupply = int.Parse(x.assets[0].template.issued_supply, CultureInfo.InvariantCulture),
+                    MaxSupply = int.Parse(x.assets[0].template.max_supply, CultureInfo.InvariantCulture),
+                    TemplateId = int.Parse(x.assets[0].template.template_id, CultureInfo.InvariantCulture),
+                    AssetId = long.Parse(x.assets[0].asset_id, CultureInfo.InvariantCulture),
                 })
                 .ToList();
 
@@ -148,52 +155,5 @@
 
             return res;
         }
-    }
-
-#pragma warning disable SA1402 // File may only contain a single type
-#pragma warning disable SA1300 // Element should begin with upper-case letter
-#pragma warning disable SA1516 // Elements should be separated by blank line
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-#pragma warning disable IDE1006 // Naming Styles
-    public class SalesRootObject
-    {
-        public bool success { get; set; }
-        public List<SaleData> data { get; set; }
-    }
-
-    public class SaleData
-    {
-        public string sale_id { get; set; }
-        public string seller { get; set; }
-        public string created_at_time { get; set; }
-        public Price price { get; set; }
-        public Asset[] assets { get; set; }
-    }
-
-    public class Price
-    {
-        public int token_precision { get; set; }
-        public string amount { get; set; }
-    }
-
-    public class Asset
-    {
-        public string asset_id { get; set; }
-        public AssetData data { get; set; }
-        public AssetTemplate template { get; set; }
-        public string template_mint { get; set; }
-    }
-
-    public class AssetData
-    {
-        public string card_id { get; set; }
-        public string name { get; set; }
-        public string rarity { get; set; }
-    }
-
-    public class AssetTemplate
-    {
-        public string issued_supply { get; set; }
-        public string max_supply { get; set; }
     }
 }
