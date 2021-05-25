@@ -39,20 +39,43 @@
 
             if (options.AlwaysWatchedAccounts != null)
             {
+                var allAccounts = dbProvider.WaxAccounts.FindAll().ToList();
                 foreach (var awa in options.AlwaysWatchedAccounts)
                 {
-                    var acc = dbProvider.WaxAccounts.FindOne(x => x.Id == awa.Key);
+                    var acc = allAccounts.FirstOrDefault(x => x.Id == awa.Key);
                     if (acc == null)
                     {
                         acc = new WaxAccount() { Id = awa.Key, IsActive = true, TelegramUserId = awa.Value };
                         dbProvider.WaxAccounts.Insert(acc);
                         logger.LogInformation($"New WaxAccount added: {acc.Id} => {acc.TelegramUserId}");
                     }
-                    else if (!acc.IsActive)
+                    else
                     {
-                        acc.IsActive = true;
-                        dbProvider.WaxAccounts.Upsert(acc);
-                        logger.LogInformation($"New WaxAccount RE-ACTIVATED: {acc.Id} => {acc.TelegramUserId}");
+                        if (!acc.IsActive)
+                        {
+                            acc.IsActive = true;
+                            dbProvider.WaxAccounts.Update(acc);
+                            logger.LogInformation($"New WaxAccount RE-ACTIVATED: {acc.Id} => {acc.TelegramUserId}");
+                        }
+
+                        if (acc.TelegramUserId != awa.Value)
+                        {
+                            acc.TelegramUserId = awa.Value;
+                            dbProvider.WaxAccounts.Update(acc);
+                            logger.LogInformation($"Telegram userId updated for {acc.Id}: {acc.TelegramUserId}");
+                        }
+
+                        allAccounts.Remove(acc);
+                    }
+                }
+
+                foreach (var acc in allAccounts)
+                {
+                    if (acc.IsActive)
+                    {
+                        acc.IsActive = false;
+                        dbProvider.WaxAccounts.Update(acc);
+                        logger.LogInformation($"New WaxAccount DISABLED: {acc.Id} => {acc.TelegramUserId}");
                     }
                 }
             }
