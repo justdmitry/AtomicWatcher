@@ -67,8 +67,12 @@
             {
                 if (disposing)
                 {
-                    db?.Dispose();
-                    db = null;
+                    if (db != null)
+                    {
+                        db.Checkpoint();
+                        db.Dispose();
+                        db = null;
+                    }
                 }
 
                 disposedValue = true;
