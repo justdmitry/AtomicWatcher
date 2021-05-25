@@ -4,12 +4,14 @@
     using LiteDB;
     using Microsoft.Extensions.Options;
 
-    public class DbProvider : IDbProvider
+    public class DbProvider : IDbProvider, IDisposable
     {
         private readonly object syncRoot = new object();
         private readonly DbOptions options;
 
         private LiteDatabase? db;
+
+        private bool disposedValue;
 
         public DbProvider(IOptions<DbOptions> options)
         {
@@ -51,6 +53,26 @@
             }
 
             return db;
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    db?.Dispose();
+                    db = null;
+                }
+
+                disposedValue = true;
+            }
         }
     }
 }
