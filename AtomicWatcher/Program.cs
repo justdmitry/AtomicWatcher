@@ -6,6 +6,8 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using NetTelegramBotApi;
 
     public class Program
     {
@@ -33,7 +35,8 @@
 
                     services
                         .Configure<TelegramOptions>(hostContext.Configuration.GetSection("TelegramOptions"))
-                        .AddTask<TelegramPublisherTask>(o => o.AutoStart(TelegramPublisherTask.Interval));
+                        .AddTask<TelegramPublisherTask>(o => o.AutoStart(TelegramPublisherTask.Interval))
+                        .AddHttpClient<ITelegramBot, TelegramBot>((hc, sp) => new TelegramBot(sp.GetRequiredService<IOptions<TelegramOptions>>().Value.BotId, hc));
 
                     services
                         .Configure<DiscordOptions>(hostContext.Configuration.GetSection("DiscordOptions"))

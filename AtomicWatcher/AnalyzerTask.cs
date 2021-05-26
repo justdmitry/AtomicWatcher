@@ -6,7 +6,6 @@
     using System.Threading.Tasks;
     using AtomicWatcher.Data;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
     using NetTelegramBotApi;
     using NetTelegramBotApi.Requests;
     using RecurrentTasks;
@@ -17,29 +16,36 @@
 
         private readonly ILogger logger;
         private readonly IDbProvider dbProvider;
-        private readonly TelegramOptions options;
+        private readonly ITelegramBot telegramBot;
 
-        private TelegramBot? telegramBot;
-
-        public AnalyzerTask(ILogger<AnalyzerTask> logger, IDbProvider dbProvider, IOptions<TelegramOptions> options)
+        public AnalyzerTask(ILogger<AnalyzerTask> logger, IDbProvider dbProvider, ITelegramBot telegramBot)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
-            this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            this.telegramBot = telegramBot ?? throw new ArgumentNullException(nameof(telegramBot));
         }
 
         public async Task RunAsync(ITask currentTask, IServiceProvider scopeServiceProvider, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(options.BotId))
-            {
-                logger.LogWarning("Telegram BotId is empty, quitting");
-                return;
-            }
-
             var accounts = dbProvider.WaxAccounts.Query().Where(x => x.IsActive).ToList();
             logger.LogDebug($"Loaded {accounts.Count} active wax accounts");
 
             var queue = new List<(WaxAccount account, int existingMint)>();
+
+            if (dbProvider.AtomicSalesAnalysisQueue.FindOne(x => true) == null)
+            {
+                return;
+            }
+
+            var me = await telegramBot.MakeRequestAsync(new GetMe()).ConfigureAwait(false);
+            if (me == null)
+            {
+                throw new ApplicationException("Failed to connect to Telegram");
+            }
+            else
+            {
+                logger.LogDebug($"Connected to Telegram as @{me.Username} / #{me.Id}");
+            }
 
             while (true)
             {
@@ -86,20 +92,6 @@
 
         private async Task SendTelegramNotifications(IList<(WaxAccount account, int existingMint)> accounts, AtomicSale sale)
         {
-            if (telegramBot == null)
-            {
-                telegramBot = new TelegramBot(options.BotId);
-                var me = await telegramBot.MakeRequestAsync(new GetMe()).ConfigureAwait(false);
-                if (me == null)
-                {
-                    throw new ApplicationException("Failed to connect to Telegram");
-                }
-                else
-                {
-                    logger.LogDebug($"Connected to Telegram as @{me.Username} / #{me.Id}");
-                }
-            }
-
             foreach (var acc in accounts)
             {
                 if (string.IsNullOrEmpty(acc.account.TelegramUserId))

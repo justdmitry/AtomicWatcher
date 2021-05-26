@@ -18,12 +18,14 @@
         private readonly ILogger logger;
         private readonly TelegramOptions options;
         private readonly IDbProvider dbProvider;
+        private readonly ITelegramBot telegramBot;
 
-        public TelegramPublisherTask(ILogger<TelegramPublisherTask> logger, IOptions<TelegramOptions> options, IDbProvider dbProvider)
+        public TelegramPublisherTask(ILogger<TelegramPublisherTask> logger, IOptions<TelegramOptions> options, IDbProvider dbProvider, ITelegramBot telegramBot)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             this.dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
+            this.telegramBot = telegramBot ?? throw new ArgumentNullException(nameof(telegramBot));
         }
 
         public async Task RunAsync(ITask currentTask, IServiceProvider scopeServiceProvider, CancellationToken cancellationToken)
@@ -43,8 +45,7 @@
                 return;
             }
 
-            var bot = new TelegramBot(options.BotId);
-            var me = await bot.MakeRequestAsync(new GetMe()).ConfigureAwait(false);
+            var me = await telegramBot.MakeRequestAsync(new GetMe()).ConfigureAwait(false);
             if (me == null)
             {
                 throw new ApplicationException("Failed to connect to Telegram");
@@ -73,7 +74,7 @@
                 else
                 {
                     var msg = new SendMessage(options.ChannelName, sb.ToString()) { ParseMode = SendMessage.ParseModeEnum.HTML, DisableWebPagePreview = true };
-                    var msgResult = await bot.MakeRequestAsync(msg).ConfigureAwait(false);
+                    var msgResult = await telegramBot.MakeRequestAsync(msg).ConfigureAwait(false);
                     logger.LogDebug($"Msg #{msgResult.MessageId} done");
                 }
             }
