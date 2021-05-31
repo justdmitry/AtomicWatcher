@@ -52,7 +52,6 @@
                         .AddTask<DiscordPublisherTask>(o => o.AutoStart(DiscordPublisherTask.Interval));
 
                     services
-                        .Configure<WaxAccountUpdaterOptions>(hostContext.Configuration.GetSection("WaxAccountUpdaterOptions"))
                         .AddTask<WaxAccountUpdaterTask>(o => o.AutoStart(WaxAccountUpdaterTask.DefaultInterval))
                         .AddTask<NewSalesLoaderTask>(o => o.AutoStart(NewSalesLoaderTask.Interval))
                         .AddTask<CardsUpdaterTask>(o => o.AutoStart(CardsUpdaterTask.Interval))
