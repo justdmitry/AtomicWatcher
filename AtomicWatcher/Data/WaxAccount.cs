@@ -13,6 +13,12 @@
 
         public Dictionary<int, int>? TemplatesAndMints { get; set; }
 
-        public string TelegramUserId { get; set; } = string.Empty;
+        public long TelegramId { get; set; }
+
+        public bool NotifyNonOwned { get; set; } = true;
+
+        public bool NotifyLowerMints { get; set; } = true;
+
+        public bool NotifyPriceGreaterThanBalance { get; set; } = true;
     }
 }

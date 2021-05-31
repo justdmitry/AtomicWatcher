@@ -1,4 +1,4 @@
-﻿namespace AtomicWatcher
+﻿namespace AtomicWatcher.AtomicHub
 {
     using System.Collections.Generic;
 
@@ -19,6 +19,12 @@
     {
         public bool success { get; set; }
         public List<SaleData> data { get; set; }
+    }
+
+    public class TemplatesRootObject
+    {
+        public bool success { get; set; }
+        public List<AssetTemplate> data { get; set; }
     }
 
     public class SaleData
@@ -54,6 +60,7 @@
 
     public class AssetTemplate
     {
+        public AssetData immutable_data { get; set; }
         public string issued_supply { get; set; }
         public string max_supply { get; set; }
         public string template_id { get; set; }

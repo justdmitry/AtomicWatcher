@@ -26,6 +26,8 @@
 
         public ILiteCollection<AtomicSale> AtomicSalesAnalysisQueue => this.GetDb().GetCollection<AtomicSale>("AtomicSalesAnalysisQueue");
 
+        public ILiteCollection<AtomicTemplate> AtomicTemplates => this.GetDb().GetCollection<AtomicTemplate>("AtomicTemplates");
+
         public ILiteCollection<WaxAccount> WaxAccounts => this.GetDb().GetCollection<WaxAccount>("WaxAccounts");
 
         public ILiteCollection<Setting> Settings => this.GetDb().GetCollection<Setting>("Settings");
@@ -47,7 +49,11 @@
                         settings.EnsureIndex(x => x.Id, true);
 
                         var waxAcc = db.GetCollection<WaxAccount>("WaxAccounts");
+                        waxAcc.EnsureIndex(x => x.TelegramId);
                         waxAcc.EnsureIndex(x => x.IsActive);
+
+                        var templates = db.GetCollection<AtomicTemplate>("AtomicTemplates");
+                        templates.EnsureIndex(x => x.CardId);
                     }
                 }
             }

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AtomicWatcher.Data;
@@ -42,6 +43,8 @@
                 return;
             }
 
+            var templates = dbProvider.AtomicTemplates.FindAll().ToList();
+
             using var client = new Discord.Webhook.DiscordWebhookClient(options.Webhook);
 
             var embeds = new List<Embed>();
@@ -53,17 +56,18 @@
                 foreach (var sale in sales)
                 {
                     var eb = new EmbedBuilder()
-                        .WithAuthor($"{sale.Name} (№{sale.CardId})", sale.RarityIcon)
-                        .WithColor(sale.RarityColor)
+                        .WithAuthor($"{sale.Name} (№{sale.CardId})", sale.Rarity?.GetRarityIcon())
+                        .WithColor(sale.Rarity.GetRarityDiscordColor())
                         .WithTimestamp(sale.Created)
                         .WithFooter("Made with ♥ and potassium");
                     eb.AddField("Seller", sale.Seller, true);
                     eb.AddField("Price", $"[{sale.Price} WAX]({sale.Link})", true);
                     eb.AddField("Mint", $"{sale.Mint} / {sale.IssuedSupply} (max {sale.MaxSupply})");
 
-                    if (CardImageFinderTask.CardImageLocations.TryGetValue(sale.CardId, out var cardUrl))
+                    var template = templates.FirstOrDefault(x => x.CardId == sale.CardId);
+                    if (template != null)
                     {
-                        eb.WithThumbnailUrl(cardUrl);
+                        eb.WithThumbnailUrl(template.Image);
                     }
 
                     embeds.Add(eb.Build());

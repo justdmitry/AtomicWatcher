@@ -4,3 +4,5 @@ bin
 obj
 lastId.json
 appsettings.Production.json
+logo.psd
+atomic-watcher.litedb

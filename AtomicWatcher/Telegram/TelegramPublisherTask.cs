@@ -1,4 +1,4 @@
-﻿namespace AtomicWatcher
+﻿namespace AtomicWatcher.Telegram
 {
     using System;
     using System.Text;
@@ -13,7 +13,9 @@
 
     public class TelegramPublisherTask : IRunnable
     {
-        public static readonly TimeSpan Interval = TimeSpan.FromMinutes(2);
+        public static readonly TimeSpan Interval = TimeSpan.FromSeconds(20);
+
+        protected static readonly TimeSpan Delay = TimeSpan.FromMinutes(2);
 
         private readonly ILogger logger;
         private readonly TelegramOptions options;
@@ -56,13 +58,14 @@
             }
 
             var sb = new StringBuilder(1024);
+            var boundary = DateTimeOffset.Now.Subtract(Delay);
             while (true)
             {
                 sb.Clear();
-                var sales = salesQueue.Find(x => true, limit: 7);
+                var sales = salesQueue.Find(x => x.Created < boundary, limit: 7);
                 foreach (var sale in sales)
                 {
-                    sb.AppendLine($@"№{sale.CardId} {sale.RaritySymbol} <b>{sale.Name}</b> #{sale.Mint} <a href='{sale.Link}'>for <b>{sale.Price}</b> WAX</a>");
+                    sb.AppendLine($@"№{sale.CardId} {sale.Rarity?.GetRaritySymbol()} <b>{sale.Name}</b> #{sale.Mint} <a href='{sale.Link}'>for <b>{sale.Price}</b> WAX</a>");
                     sb.AppendLine();
                     salesQueue.Delete(sale.Id);
                 }

@@ -1,7 +1,9 @@
 ﻿namespace AtomicWatcher
 {
     using System;
+    using System.Linq;
     using AtomicWatcher.Data;
+    using AtomicWatcher.Telegram;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -24,19 +26,26 @@
                         .AddLogging(o => o.AddConfiguration(hostContext.Configuration.GetSection("Logging")).AddConsole())
                         .AddHttpClient();
 
-                    services.AddTask<CardImageFinderTask>(o => o.AutoStart(CardImageFinderTask.Interval, TimeSpan.FromSeconds(3)));
-
                     services.Configure<DbOptions>(hostContext.Configuration.GetSection("DbOptions"));
                     services.AddSingleton<IDbProvider, DbProvider>();
 
                     services
-                        .Configure<AtomicOptions>(hostContext.Configuration.GetSection("AtomicOptions"))
-                        .AddTask<AtomicLoaderTask>(o => o.AutoStart(AtomicLoaderTask.Interval));
+                        .Configure<AtomicHub.AtomicOptions>(hostContext.Configuration.GetSection("AtomicOptions"))
+                        .AddHttpClient<AtomicHub.IAtomicService, AtomicHub.AtomicService>();
 
                     services
                         .Configure<TelegramOptions>(hostContext.Configuration.GetSection("TelegramOptions"))
                         .AddTask<TelegramPublisherTask>(o => o.AutoStart(TelegramPublisherTask.Interval))
                         .AddHttpClient<ITelegramBot, TelegramBot>((hc, sp) => new TelegramBot(sp.GetRequiredService<IOptions<TelegramOptions>>().Value.BotId, hc));
+
+                    services
+                        .AddSingleton<NetTelegramBot.Framework.ICommandParser>(_ => new NetTelegramBot.Framework.CommandParser('_'))
+                        .AddTelegramBot<NotifierBot>(hostContext.Configuration["TelegramOptions:BotId"], default(Uri));
+
+                    foreach (var command in Telegram.NotifierBot.AdminCommandHandlers.Concat(Telegram.NotifierBot.UserCommandHandlers))
+                    {
+                        services.AddTransient(command.Value);
+                    }
 
                     services
                         .Configure<DiscordOptions>(hostContext.Configuration.GetSection("DiscordOptions"))
@@ -45,6 +54,8 @@
                     services
                         .Configure<WaxAccountUpdaterOptions>(hostContext.Configuration.GetSection("WaxAccountUpdaterOptions"))
                         .AddTask<WaxAccountUpdaterTask>(o => o.AutoStart(WaxAccountUpdaterTask.DefaultInterval))
+                        .AddTask<NewSalesLoaderTask>(o => o.AutoStart(NewSalesLoaderTask.Interval))
+                        .AddTask<CardsUpdaterTask>(o => o.AutoStart(CardsUpdaterTask.Interval))
                         .AddTask<AnalyzerTask>(o => o.AutoStart(AnalyzerTask.Interval));
                 });
     }

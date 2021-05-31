@@ -66,14 +66,14 @@
                         continue;
                     }
 
-                    if (!acc.TemplatesAndMints.TryGetValue(sale.TemplateId, out var mint))
+                    if (!acc.TemplatesAndMints.TryGetValue(sale.TemplateId, out var mint) && acc.NotifyNonOwned)
                     {
                         logger.LogDebug($"Account '{acc.Id}' has no template {sale.TemplateId} (card {sale.CardId} {sale.Name}), will notify");
                         queue.Add((acc, 0));
                         continue;
                     }
 
-                    if (mint > sale.Mint)
+                    if (mint > sale.Mint && acc.NotifyLowerMints)
                     {
                         logger.LogDebug($"Account '{acc.Id}' has older mint of template {sale.TemplateId} (card {sale.CardId} {sale.Name}): {mint} vs {sale.Mint}, will notify");
                         queue.Add((acc, mint));
@@ -94,16 +94,16 @@
         {
             foreach (var acc in accounts)
             {
-                if (string.IsNullOrEmpty(acc.account.TelegramUserId))
+                if (acc.account.TelegramId == 0)
                 {
                     logger.LogWarning($"Account '{acc.account.Id}' have no telegram userId, skipped");
                     continue;
                 }
 
-                var text = $@"№{sale.CardId} {sale.RaritySymbol} <b>{sale.Name}</b>
+                var text = $@"№{sale.CardId} {sale.Rarity?.GetRaritySymbol()} <b>{sale.Name}</b>
 Mint {sale.Mint} (you have {(acc.existingMint == 0 ? "-NONE-" : acc.existingMint)})
 <a href='{sale.Link}'>For <b>{sale.Price}</b> WAX</a> by {sale.Seller}";
-                var msg = new SendMessage(acc.account.TelegramUserId, text) { ParseMode = SendMessage.ParseModeEnum.HTML, DisableWebPagePreview = true };
+                var msg = new SendMessage(acc.account.TelegramId, text) { ParseMode = SendMessage.ParseModeEnum.HTML, DisableWebPagePreview = true };
                 await telegramBot.MakeRequestAsync(msg).ConfigureAwait(false);
             }
         }

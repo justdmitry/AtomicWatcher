@@ -12,6 +12,8 @@
 
         ILiteCollection<AtomicSale> AtomicSalesAnalysisQueue { get; }
 
+        ILiteCollection<AtomicTemplate> AtomicTemplates { get; }
+
         ILiteCollection<WaxAccount> WaxAccounts { get; }
 
         ILiteCollection<Setting> Settings { get; }
