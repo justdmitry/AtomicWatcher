@@ -15,6 +15,8 @@
     {
         public static readonly TimeSpan Interval = TimeSpan.FromMinutes(2);
 
+        protected static readonly TimeSpan Delay = TimeSpan.FromMinutes(2);
+
         private readonly ILogger logger;
         private readonly DiscordOptions options;
         private readonly IDbProvider dbProvider;
@@ -48,11 +50,11 @@
             using var client = new Discord.Webhook.DiscordWebhookClient(options.Webhook);
 
             var embeds = new List<Embed>();
-
+            var boundary = DateTimeOffset.Now.Subtract(Delay);
             while (true)
             {
                 embeds.Clear();
-                var sales = salesQueue.Find(x => true, limit: 5);
+                var sales = salesQueue.Find(x => x.Created < boundary, limit: 7);
                 foreach (var sale in sales)
                 {
                     var eb = new EmbedBuilder()
