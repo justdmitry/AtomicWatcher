@@ -20,6 +20,11 @@
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureLogging(builder => builder.AddSystemdConsole(options =>
+                {
+                    options.IncludeScopes = true;
+                    options.TimestampFormat = "hh:mm:ss ";
+                }))
                 .ConfigureServices((hostContext, services) =>
                 {
                     services
