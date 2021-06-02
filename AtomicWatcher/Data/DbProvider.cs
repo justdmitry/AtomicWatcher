@@ -30,6 +30,8 @@
 
         public ILiteCollection<WaxAccount> WaxAccounts => this.GetDb().GetCollection<WaxAccount>("WaxAccounts");
 
+        public ILiteCollection<WatchRule> WatchRules => this.GetDb().GetCollection<WatchRule>("WatchRules");
+
         public ILiteCollection<Setting> Settings => this.GetDb().GetCollection<Setting>("Settings");
 
         public LiteDatabase GetDb()
@@ -54,6 +56,9 @@
 
                         var templates = db.GetCollection<AtomicTemplate>("AtomicTemplates");
                         templates.EnsureIndex(x => x.CardId);
+
+                        var rules = db.GetCollection<WatchRule>("WatchRules");
+                        rules.EnsureIndex(x => x.WaxAccountId);
                     }
                 }
             }

@@ -79,6 +79,9 @@
             sb.AppendLine();
             sb.AppendLine("Click on command to toggle.");
 
+            sb.AppendLine();
+            sb.AppendLine("Also, check /rules command for additional notifications.");
+
             await bot.SendAsync(new SendMessage(message.Chat.Id, sb.ToString()) { ParseMode = SendMessage.ParseModeEnum.Markdown }).ConfigureAwait(false);
         }
 

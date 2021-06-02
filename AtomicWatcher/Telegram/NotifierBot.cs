@@ -23,6 +23,7 @@
             ["inventory"] = typeof(InventoryCommand),
             ["set"] = typeof(SettingsCommand),
             ["settings"] = typeof(SettingsCommand),
+            ["rules"] = typeof(RulesCommand),
         };
 
         public NotifierBot(ILogger<NotifierBot> logger, ICommandParser commandParser, IHttpClientFactory httpClientFactory)

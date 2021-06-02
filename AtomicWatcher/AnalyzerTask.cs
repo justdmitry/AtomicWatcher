@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AtomicWatcher.Data;
@@ -27,15 +28,15 @@
 
         public async Task RunAsync(ITask currentTask, IServiceProvider scopeServiceProvider, CancellationToken cancellationToken)
         {
-            var accounts = dbProvider.WaxAccounts.Query().Where(x => x.IsActive).ToList();
-            logger.LogDebug($"Loaded {accounts.Count} active wax accounts");
-
-            var queue = new List<(WaxAccount account, int existingMint)>();
-
             if (dbProvider.AtomicSalesAnalysisQueue.FindOne(x => true) == null)
             {
                 return;
             }
+
+            var accounts = dbProvider.WaxAccounts.Query().Where(x => x.IsActive).ToList();
+            logger.LogDebug($"Loaded {accounts.Count} active wax accounts");
+
+            var queue = new List<(WaxAccount account, int existingMint)>();
 
             var me = await telegramBot.MakeRequestAsync(new GetMe()).ConfigureAwait(false);
             if (me == null)
@@ -46,6 +47,8 @@
             {
                 logger.LogDebug($"Connected to Telegram as @{me.Username} / #{me.Id}");
             }
+
+            var allRules = dbProvider.WatchRules.FindAll().ToList();
 
             while (true)
             {
@@ -77,6 +80,24 @@
                     {
                         logger.LogDebug($"Account '{acc.Id}' has older mint of template {sale.TemplateId} (card {sale.CardId} {sale.Name}): {mint} vs {sale.Mint}, will notify");
                         queue.Add((acc, mint));
+                        continue;
+                    }
+
+                    var rules = allRules.Where(x => x.WaxAccountId == acc.Id);
+
+                    var ignoreRule = rules.Where(x => x.Ignore).FirstOrDefault(x => Matches(x, sale));
+                    if (ignoreRule != null)
+                    {
+                        logger.LogDebug($"Account '{acc.Id}' has 'ignore' rule {ignoreRule.Id} for card {sale.CardId} ({sale.Name}), #{sale.Mint}");
+                        continue;
+                    }
+
+                    var acceptRule = rules.Where(x => !x.Ignore).FirstOrDefault(x => Matches(x, sale));
+                    if (acceptRule != null)
+                    {
+                        logger.LogDebug($"Account '{acc.Id}' has 'notify' rule {acceptRule.Id} for card {sale.CardId} ({sale.Name}), #{sale.Mint}, will notify");
+                        queue.Add((acc, mint));
+                        continue;
                     }
                 }
 
@@ -90,7 +111,7 @@
             }
         }
 
-        private async Task SendTelegramNotifications(IList<(WaxAccount account, int existingMint)> accounts, AtomicSale sale)
+        protected async Task SendTelegramNotifications(IList<(WaxAccount account, int existingMint)> accounts, AtomicSale sale)
         {
             foreach (var acc in accounts)
             {
@@ -106,6 +127,46 @@ Mint {sale.Mint} (you have {(acc.existingMint == 0 ? "-NONE-" : acc.existingMint
                 var msg = new SendMessage(acc.account.TelegramId, text) { ParseMode = SendMessage.ParseModeEnum.HTML, DisableWebPagePreview = true };
                 await telegramBot.MakeRequestAsync(msg).ConfigureAwait(false);
             }
+        }
+
+        private static bool Matches(WatchRule rule, AtomicSale sale)
+        {
+            if (!string.IsNullOrEmpty(rule.Rarity) && sale.Rarity != rule.Rarity)
+            {
+                return false;
+            }
+
+            if (rule.MinCardId.HasValue && sale.CardId < rule.MinCardId)
+            {
+                return false;
+            }
+
+            if (rule.MaxCardId.HasValue && sale.CardId > rule.MaxCardId)
+            {
+                return false;
+            }
+
+            if (rule.MinMint.HasValue && sale.Mint < rule.MinMint)
+            {
+                return false;
+            }
+
+            if (rule.MaxMint.HasValue && sale.Mint > rule.MaxMint)
+            {
+                return false;
+            }
+
+            if (rule.MinPrice.HasValue && sale.Price < rule.MinPrice)
+            {
+                return false;
+            }
+
+            if (rule.MaxPrice.HasValue && sale.Price > rule.MaxPrice)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

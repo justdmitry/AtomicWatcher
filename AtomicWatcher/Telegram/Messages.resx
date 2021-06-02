@@ -124,10 +124,53 @@
     <value>Available commands:
 /help - this message
 /inventory - list of NFTs you own
-/settings - notification settings</value>
+/settings - notification settings
+/rules - notification rules</value>
   </data>
   <data name="Inventory_AccountNotFound" xml:space="preserve">
     <value>Sorry, account `{0}` is not watched.</value>
+  </data>
+  <data name="Rules_Add_WrongArguments" xml:space="preserve">
+    <value>Wrong arguments. Send /rules_help for help</value>
+  </data>
+  <data name="Rules_Delete_NotFound" xml:space="preserve">
+    <value>Can't delete rule `{0}` - rule not found.</value>
+  </data>
+  <data name="Rules_Delete_Ok" xml:space="preserve">
+    <value>Rule `{0}` deleted.
+Send /rules to see actual list.</value>
+  </data>
+  <data name="Rules_Delete_WrongArguments" xml:space="preserve">
+    <value>Wrong arguments. Correct syntax:
+`/rules del &lt;rule id&gt;`</value>
+  </data>
+  <data name="Rules_Help" xml:space="preserve">
+    <value>Manage your watch rules:
+`/rules` - list all your rules
+`/rules add &lt;param1&gt; &lt;param2&gt;...` - add new rule (see params below)
+`/rules del &lt;rule id&gt;` - delete rule #id
+`/rules help` - this message
+
+Allowed params for "rules add":
+`min-mint`=&lt;X&gt;, `max-mint`=&lt;X&gt; - filter by mint
+`min-card`=&lt;X&gt;, `max-card`=&lt;X&gt; - filter by card number (cardId field value)
+`min-price`=&lt;X&gt;, `max-price`=&lt;X&gt; - filter by price (in WAX)
+`rarity`={ common | uncommon | rare | epic | legendary } - filter by rarity
+`ignore` - do NOT notify when matched, when if other rule matches
+
+Examples:
+1) Notify about 'rare' cards with number 30 or earlier, with price 300 or less:
+`/rules add rarity=rare max-card=30 max-price=300`
+
+2) Notify about all cards with mint=119:
+`/rules add min-mint=119 max-mint=119`</value>
+  </data>
+  <data name="Rules_None" xml:space="preserve">
+    <value>You have no rules. Read /rules_help to create one.</value>
+  </data>
+  <data name="Rule_Add_Ok" xml:space="preserve">
+    <value>Rule `{0}` was added.
+Send /rules to see full list.</value>
   </data>
   <data name="Settings_Changed" xml:space="preserve">
     <value>Changed.</value>

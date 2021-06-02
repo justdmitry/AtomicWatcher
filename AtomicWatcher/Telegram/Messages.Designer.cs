@@ -73,7 +73,8 @@ namespace AtomicWatcher.Telegram {
         ///   Looks up a localized string similar to Available commands:
         ////help - this message
         ////inventory - list of NFTs you own
-        ////settings - notification settings.
+        ////settings - notification settings
+        ////rules - notification rules.
         /// </summary>
         public static string Help {
             get {
@@ -87,6 +88,83 @@ namespace AtomicWatcher.Telegram {
         public static string Inventory_AccountNotFound {
             get {
                 return ResourceManager.GetString("Inventory_AccountNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rule `{0}` was added.
+        ///Send /rules to see full list..
+        /// </summary>
+        public static string Rule_Add_Ok {
+            get {
+                return ResourceManager.GetString("Rule_Add_Ok", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong arguments. Send /rules_help for help.
+        /// </summary>
+        public static string Rules_Add_WrongArguments {
+            get {
+                return ResourceManager.GetString("Rules_Add_WrongArguments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t delete rule `{0}` - rule not found..
+        /// </summary>
+        public static string Rules_Delete_NotFound {
+            get {
+                return ResourceManager.GetString("Rules_Delete_NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rule `{0}` deleted.
+        ///Send /rules to see actual list..
+        /// </summary>
+        public static string Rules_Delete_Ok {
+            get {
+                return ResourceManager.GetString("Rules_Delete_Ok", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong arguments. Correct syntax:
+        ///`/rules del &lt;rule id&gt;`.
+        /// </summary>
+        public static string Rules_Delete_WrongArguments {
+            get {
+                return ResourceManager.GetString("Rules_Delete_WrongArguments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manage your watch rules:
+        ///`/rules` - list all your rules
+        ///`/rules add &lt;param1&gt; &lt;param2&gt;...` - add new rule (see params below)
+        ///`/rules del &lt;rule id&gt;` - delete rule #id
+        ///`/rules help` - this message
+        ///
+        ///Allowed params for &quot;rules add&quot;:
+        ///`min-mint`=&lt;X&gt;, `max-mint`=&lt;X&gt; - filter by mint
+        ///`min-card`=&lt;X&gt;, `max-card`=&lt;X&gt; - filter by card number (cardId field value)
+        ///`min-price`=&lt;X&gt;, `max-price`=&lt;X&gt; - filter by price (in WAX)
+        ///`rarity`={ common | uncommon | rare | epic | legendary } - filter by rarity
+        ///`ignore` - do  [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string Rules_Help {
+            get {
+                return ResourceManager.GetString("Rules_Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have no rules. Read /rules_help to create one..
+        /// </summary>
+        public static string Rules_None {
+            get {
+                return ResourceManager.GetString("Rules_None", resourceCulture);
             }
         }
         

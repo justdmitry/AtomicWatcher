@@ -16,6 +16,8 @@
 
         ILiteCollection<WaxAccount> WaxAccounts { get; }
 
+        ILiteCollection<WatchRule> WatchRules { get; }
+
         ILiteCollection<Setting> Settings { get; }
     }
 }
