@@ -169,6 +169,15 @@ namespace AtomicWatcher.Telegram {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You have enough rules, you can&apos;t add more..
+        /// </summary>
+        public static string Rules_TooMany {
+            get {
+                return ResourceManager.GetString("Rules_TooMany", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Changed..
         /// </summary>
         public static string Settings_Changed {

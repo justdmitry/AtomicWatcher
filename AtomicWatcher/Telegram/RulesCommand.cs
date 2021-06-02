@@ -14,6 +14,8 @@
 
     public class RulesCommand : ICommandHandler
     {
+        private const int MaxRulesCount = 19;
+
         private readonly IDbProvider dbProvider;
 
         public RulesCommand(IDbProvider dbProvider)
@@ -143,6 +145,13 @@
             if (command.Args == null || command.Args.Length < 2)
             {
                 await bot.SendAsync(new SendMessage(message.Chat.Id, Messages.Rules_Add_WrongArguments) { ReplyToMessageId = message.MessageId, ParseMode = SendMessage.ParseModeEnum.Markdown });
+                return;
+            }
+
+            var rules = dbProvider.WatchRules.Find(x => x.WaxAccountId == accountId).ToList();
+            if (rules.Count >= MaxRulesCount)
+            {
+                await bot.SendAsync(new SendMessage(message.Chat.Id, Messages.Rules_TooMany) { ReplyToMessageId = message.MessageId, ParseMode = SendMessage.ParseModeEnum.Markdown });
                 return;
             }
 

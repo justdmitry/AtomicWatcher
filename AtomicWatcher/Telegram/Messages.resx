@@ -168,6 +168,9 @@ Examples:
   <data name="Rules_None" xml:space="preserve">
     <value>You have no rules. Read /rules_help to create one.</value>
   </data>
+  <data name="Rules_TooMany" xml:space="preserve">
+    <value>You have enough rules, you can't add more.</value>
+  </data>
   <data name="Rule_Add_Ok" xml:space="preserve">
     <value>Rule `{0}` was added.
 Send /rules to see full list.</value>
