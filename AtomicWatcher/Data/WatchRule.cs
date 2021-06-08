@@ -5,13 +5,17 @@
 
     public class WatchRule
     {
-        public ObjectId Id { get; set; } = ObjectId.Empty;
+        public ObjectId Id { get; set; } = ObjectId.NewObjectId();
 
         public string WaxAccountId { get; set; } = string.Empty;
 
-        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset Created { get; set; } = DateTimeOffset.Now;
 
         public bool Ignore { get; set; }
+
+        public bool LowerMints { get; set; }
+
+        public bool Absent { get; set; }
 
         public string? Rarity { get; set; }
 

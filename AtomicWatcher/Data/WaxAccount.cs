@@ -15,10 +15,13 @@
 
         public long TelegramId { get; set; }
 
-        public bool NotifyNonOwned { get; set; } = true;
+        [Obsolete("Use WatchRules")]
+        public bool? NotifyNonOwned { get; set; } = true;
 
-        public bool NotifyLowerMints { get; set; } = true;
+        [Obsolete("Use WatchRules")]
+        public bool? NotifyLowerMints { get; set; } = true;
 
-        public bool NotifyPriceGreaterThanBalance { get; set; } = true;
+        [Obsolete("Use WatchRules")]
+        public bool? NotifyPriceGreaterThanBalance { get; set; } = true;
     }
 }

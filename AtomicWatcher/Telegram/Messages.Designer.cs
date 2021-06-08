@@ -151,7 +151,7 @@ namespace AtomicWatcher.Telegram {
         ///`min-card`=&lt;X&gt;, `max-card`=&lt;X&gt; - filter by card number (cardId field value)
         ///`min-price`=&lt;X&gt;, `max-price`=&lt;X&gt; - filter by price (in WAX)
         ///`rarity`={ common | uncommon | rare | epic | legendary } - filter by rarity
-        ///`ignore` - do  [rest of string was truncated]&quot;;.
+        ///`absent` - not [rest of string was truncated]&quot;;.
         /// </summary>
         public static string Rules_Help {
             get {
@@ -178,20 +178,11 @@ namespace AtomicWatcher.Telegram {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Changed..
+        ///   Looks up a localized string similar to This command (settings) is deprecated. User /rules command instead..
         /// </summary>
-        public static string Settings_Changed {
+        public static string Settings_Deprecated {
             get {
-                return ResourceManager.GetString("Settings_Changed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Wrong &apos;set&apos; command format. Ask /settings for list of available commands..
-        /// </summary>
-        public static string Settings_Invalid {
-            get {
-                return ResourceManager.GetString("Settings_Invalid", resourceCulture);
+                return ResourceManager.GetString("Settings_Deprecated", resourceCulture);
             }
         }
         

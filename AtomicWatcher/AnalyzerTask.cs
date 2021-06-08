@@ -36,7 +36,7 @@
             var accounts = dbProvider.WaxAccounts.Query().Where(x => x.IsActive).ToList();
             logger.LogDebug($"Loaded {accounts.Count} active wax accounts");
 
-            var queue = new List<(WaxAccount account, int existingMint)>();
+            var queue = new List<(WaxAccount account, int? existingMint)>();
 
             var me = await telegramBot.MakeRequestAsync(new GetMe()).ConfigureAwait(false);
             if (me == null)
@@ -69,30 +69,19 @@
                         continue;
                     }
 
-                    if (!acc.TemplatesAndMints.TryGetValue(sale.TemplateId, out var mint) && acc.NotifyNonOwned)
-                    {
-                        logger.LogDebug($"Account '{acc.Id}' has no template {sale.TemplateId} (card {sale.CardId} {sale.Name}), will notify");
-                        queue.Add((acc, 0));
-                        continue;
-                    }
-
-                    if (mint > sale.Mint && acc.NotifyLowerMints)
-                    {
-                        logger.LogDebug($"Account '{acc.Id}' has older mint of template {sale.TemplateId} (card {sale.CardId} {sale.Name}): {mint} vs {sale.Mint}, will notify");
-                        queue.Add((acc, mint));
-                        continue;
-                    }
+                    var haveCard = acc.TemplatesAndMints.TryGetValue(sale.TemplateId, out var existingMint);
+                    var mint = haveCard ? existingMint : default(int?);
 
                     var rules = allRules.Where(x => x.WaxAccountId == acc.Id);
 
-                    var ignoreRule = rules.Where(x => x.Ignore).FirstOrDefault(x => Matches(x, sale));
+                    var ignoreRule = rules.Where(x => x.Ignore).FirstOrDefault(x => Matches(x, sale, mint));
                     if (ignoreRule != null)
                     {
                         logger.LogDebug($"Account '{acc.Id}' has 'ignore' rule {ignoreRule.Id} for card {sale.CardId} ({sale.Name}), #{sale.Mint}");
                         continue;
                     }
 
-                    var acceptRule = rules.Where(x => !x.Ignore).FirstOrDefault(x => Matches(x, sale));
+                    var acceptRule = rules.Where(x => !x.Ignore).FirstOrDefault(x => Matches(x, sale, mint));
                     if (acceptRule != null)
                     {
                         logger.LogDebug($"Account '{acc.Id}' has 'notify' rule {acceptRule.Id} for card {sale.CardId} ({sale.Name}), #{sale.Mint}, will notify");
@@ -111,7 +100,7 @@
             }
         }
 
-        protected async Task SendTelegramNotifications(IList<(WaxAccount account, int existingMint)> accounts, AtomicSale sale)
+        protected async Task SendTelegramNotifications(IList<(WaxAccount account, int? existingMint)> accounts, AtomicSale sale)
         {
             foreach (var acc in accounts)
             {
@@ -122,14 +111,14 @@
                 }
 
                 var text = $@"№{sale.CardId} {sale.Rarity?.GetRaritySymbol()} <b>{sale.Name}</b>
-Mint {sale.Mint} (you have {(acc.existingMint == 0 ? "-NONE-" : acc.existingMint)})
+Mint {sale.Mint} (you have {(acc.existingMint.HasValue ? acc.existingMint : "-NONE-")})
 <a href='{sale.Link}'>For <b>{sale.Price}</b> WAX</a> by {sale.Seller}";
                 var msg = new SendMessage(acc.account.TelegramId, text) { ParseMode = SendMessage.ParseModeEnum.HTML, DisableWebPagePreview = true };
                 await telegramBot.MakeRequestAsync(msg).ConfigureAwait(false);
             }
         }
 
-        private static bool Matches(WatchRule rule, AtomicSale sale)
+        private static bool Matches(WatchRule rule, AtomicSale sale, int? existingMint)
         {
             if (!string.IsNullOrEmpty(rule.Rarity) && sale.Rarity != rule.Rarity)
             {
@@ -162,6 +151,16 @@ Mint {sale.Mint} (you have {(acc.existingMint == 0 ? "-NONE-" : acc.existingMint
             }
 
             if (rule.MaxPrice.HasValue && sale.Price > rule.MaxPrice)
+            {
+                return false;
+            }
+
+            if (rule.Absent && existingMint.HasValue)
+            {
+                return false;
+            }
+
+            if (rule.LowerMints && (existingMint == null || existingMint.Value < sale.Mint))
             {
                 return false;
             }

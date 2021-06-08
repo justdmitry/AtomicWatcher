@@ -156,14 +156,19 @@ Allowed params for "rules add":
 `min-card`=&lt;X&gt;, `max-card`=&lt;X&gt; - filter by card number (cardId field value)
 `min-price`=&lt;X&gt;, `max-price`=&lt;X&gt; - filter by price (in WAX)
 `rarity`={ common | uncommon | rare | epic | legendary } - filter by rarity
-`ignore` - do NOT notify when matched, when if other rule matches
+`absent` - notify when you don't have this card
+`lower` - notify when sale has lower (less) mint than you have
+`ignore` - do NOT notify when matched, even if other rule matches
 
 Examples:
 1) Notify about 'rare' cards with number 30 or earlier, with price 300 or less:
 `/rules add rarity=rare max-card=30 max-price=300`
 
 2) Notify about all cards with mint=119:
-`/rules add min-mint=119 max-mint=119`</value>
+`/rules add min-mint=119 max-mint=119`
+
+3) Notify about cards you don't have, with price 100 or less:
+`/rules add absent max-price=100`</value>
   </data>
   <data name="Rules_None" xml:space="preserve">
     <value>You have no rules. Read /rules_help to create one.</value>
@@ -175,11 +180,8 @@ Examples:
     <value>Rule `{0}` was added.
 Send /rules to see full list.</value>
   </data>
-  <data name="Settings_Changed" xml:space="preserve">
-    <value>Changed.</value>
-  </data>
-  <data name="Settings_Invalid" xml:space="preserve">
-    <value>Wrong 'set' command format. Ask /settings for list of available commands.</value>
+  <data name="Settings_Deprecated" xml:space="preserve">
+    <value>This command (settings) is deprecated. User /rules command instead.</value>
   </data>
   <data name="Users_Add_Success" xml:space="preserve">
     <value>Account {0} added to user {1}. Send /users to see full list.</value>

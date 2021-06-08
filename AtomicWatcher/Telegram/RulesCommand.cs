@@ -101,10 +101,13 @@
                         (_, _) => rule.MinPrice == rule.MaxPrice ? $"price = {rule.MaxPrice}" : $"price {rule.MinPrice}…{rule.MaxPrice}",
                     };
 
+                    var ruleAbsent = rule.Absent ? "absent (don't have)" : null;
+                    var ruleLowerMint = rule.LowerMints ? "with lower mint" : null;
+
                     sb.Append(counter);
                     sb.Append(". ");
                     sb.Append(rule.Ignore ? "*IGNORE* " : "*Notify* ");
-                    sb.AppendLine(string.Join(", ", new[] { ruleRarity, ruleCard, ruleMint, rulePrice }.Where(x => x != null)));
+                    sb.AppendLine(string.Join(", ", new[] { ruleAbsent, ruleLowerMint, ruleRarity, ruleCard, ruleMint, rulePrice }.Where(x => x != null)));
                     sb.AppendLine($"    delete: /rules\\_del\\_{rule.Id}");
                 }
 
@@ -155,7 +158,7 @@
                 return;
             }
 
-            var rule = new WatchRule() { Id = new ObjectId(), WaxAccountId = accountId };
+            var rule = new WatchRule() { WaxAccountId = accountId };
 
             var parts =
                 string.Join(' ', message.Text.ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries))
@@ -175,6 +178,14 @@
 
                     case "ignore":
                         rule.Ignore = true;
+                        continue;
+
+                    case "absent":
+                        rule.Absent = true;
+                        continue;
+
+                    case "lower":
+                        rule.LowerMints = true;
                         continue;
 
                     default:
@@ -266,6 +277,13 @@
             if (!looksGood)
             {
                 var msg = $"Failed to parse your command to valid rule. Please verity and report to my master.";
+                await bot.SendAsync(new SendMessage(message.Chat.Id, msg) { ReplyToMessageId = message.MessageId, ParseMode = SendMessage.ParseModeEnum.Markdown });
+                return;
+            }
+
+            if (rule.Absent && rule.LowerMints)
+            {
+                var msg = $"Invalid params: can't have 'absent' and 'lower' in one rule (it will never match).";
                 await bot.SendAsync(new SendMessage(message.Chat.Id, msg) { ReplyToMessageId = message.MessageId, ParseMode = SendMessage.ParseModeEnum.Markdown });
                 return;
             }

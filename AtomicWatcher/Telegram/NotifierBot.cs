@@ -15,6 +15,7 @@
         public static readonly Dictionary<string, Type> AdminCommandHandlers = new Dictionary<string, Type>()
         {
             ["users"] = typeof(Admin.UsersCommand),
+            ["ver"] = typeof(Admin.VersionCommand),
         };
 
         public static readonly Dictionary<string, Type> UserCommandHandlers = new Dictionary<string, Type>()
