@@ -63,7 +63,7 @@
             foreach (var sale in atomicSales)
             {
                 dbProvider.AtomicSales.Upsert(sale);
-                dbProvider.AtomicSalesTelegramQueue.Upsert(sale);
+                ////dbProvider.AtomicSalesTelegramQueue.Upsert(sale);
                 dbProvider.AtomicSalesDiscordQueue.Upsert(sale);
                 dbProvider.AtomicSalesAnalysisQueue.Upsert(sale);
             }
