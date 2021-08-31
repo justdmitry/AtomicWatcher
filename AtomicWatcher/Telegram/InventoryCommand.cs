@@ -60,12 +60,12 @@
             var sb = new StringBuilder();
             sb.AppendLine($"Current content of `{account.Id}` (updated {(int)DateTimeOffset.Now.Subtract(account.LastUpdated).TotalMinutes}min ago):");
             sb.AppendLine();
-            foreach (var batch in templates.OrderBy(x => x.CardId).Batch(19))
+            foreach (var batch in templates.OrderBy(x => x.Id).Batch(19))
             {
                 foreach (var template in batch)
                 {
                     sb.Append("№");
-                    sb.Append(template.CardId);
+                    sb.Append(template.Id);
                     sb.Append(" ");
                     sb.Append(template.Rarity.GetRaritySymbol());
                     sb.Append(" ");

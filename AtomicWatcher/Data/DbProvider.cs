@@ -45,7 +45,7 @@
                         db = new LiteDatabase(options.Path);
 
                         var sales = db.GetCollection<AtomicSale>("AtomicSales");
-                        sales.EnsureIndex(x => x.CardId);
+                        sales.EnsureIndex(x => x.TemplateId);
 
                         var settings = db.GetCollection<Setting>("Settings");
                         settings.EnsureIndex(x => x.Id, true);
@@ -55,7 +55,6 @@
                         waxAcc.EnsureIndex(x => x.IsActive);
 
                         var templates = db.GetCollection<AtomicTemplate>("AtomicTemplates");
-                        templates.EnsureIndex(x => x.CardId);
 
                         var rules = db.GetCollection<WatchRule>("WatchRules");
                         rules.EnsureIndex(x => x.WaxAccountId);

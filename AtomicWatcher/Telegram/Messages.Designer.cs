@@ -148,10 +148,10 @@ namespace AtomicWatcher.Telegram {
         ///
         ///Allowed params for &quot;rules add&quot;:
         ///`min-mint`=&lt;X&gt;, `max-mint`=&lt;X&gt; - filter by mint
-        ///`min-card`=&lt;X&gt;, `max-card`=&lt;X&gt; - filter by card number (cardId field value)
+        ///`min-template`=&lt;X&gt;, `max-template`=&lt;X&gt; - filter by template Id
         ///`min-price`=&lt;X&gt;, `max-price`=&lt;X&gt; - filter by price (in WAX)
         ///`rarity`={ common | uncommon | rare | epic | legendary } - filter by rarity
-        ///`absent` - not [rest of string was truncated]&quot;;.
+        ///`absent` - notify when you  [rest of string was truncated]&quot;;.
         /// </summary>
         public static string Rules_Help {
             get {

@@ -153,7 +153,7 @@ Send /rules to see actual list.</value>
 
 Allowed params for "rules add":
 `min-mint`=&lt;X&gt;, `max-mint`=&lt;X&gt; - filter by mint
-`min-card`=&lt;X&gt;, `max-card`=&lt;X&gt; - filter by card number (cardId field value)
+`min-template`=&lt;X&gt;, `max-template`=&lt;X&gt; - filter by template Id
 `min-price`=&lt;X&gt;, `max-price`=&lt;X&gt; - filter by price (in WAX)
 `rarity`={ common | uncommon | rare | epic | legendary } - filter by rarity
 `absent` - notify when you don't have this card

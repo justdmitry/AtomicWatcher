@@ -24,8 +24,6 @@
 
         public int MaxSupply { get; set; }
 
-        public int CardId { get; set; }
-
         public int TemplateId { get; set; }
 
         public long AssetId { get; set; }

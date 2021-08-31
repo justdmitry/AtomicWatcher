@@ -48,7 +48,6 @@
                     Name = x.assets[0].data.name,
                     Rarity = x.assets[0].data.rarity,
                     Seller = x.seller,
-                    CardId = int.Parse(x.assets[0].data?.card_id ?? "0", CultureInfo.InvariantCulture),
                     Price = decimal.Parse(x.price.amount, CultureInfo.InvariantCulture) / (decimal)Math.Pow(10, x.price.token_precision),
                     Mint = int.Parse(x.assets[0].template_mint, CultureInfo.InvariantCulture),
                     IssuedSupply = int.Parse(x.assets[0].template.issued_supply, CultureInfo.InvariantCulture),

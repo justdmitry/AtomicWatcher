@@ -19,10 +19,6 @@
 
         public string? Rarity { get; set; }
 
-        public int? MinCardId { get; set; }
-
-        public int? MaxCardId { get; set; }
-
         public int? MinMint { get; set; }
 
         public int? MaxMint { get; set; }
@@ -30,5 +26,9 @@
         public decimal? MinPrice { get; set; }
 
         public decimal? MaxPrice { get; set; }
+
+        public int? MinTemplate { get; set; }
+
+        public int? MaxTemplate { get; set; }
     }
 }

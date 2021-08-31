@@ -14,14 +14,5 @@
         public Dictionary<int, int>? TemplatesAndMints { get; set; }
 
         public long TelegramId { get; set; }
-
-        [Obsolete("Use WatchRules")]
-        public bool? NotifyNonOwned { get; set; } = true;
-
-        [Obsolete("Use WatchRules")]
-        public bool? NotifyLowerMints { get; set; } = true;
-
-        [Obsolete("Use WatchRules")]
-        public bool? NotifyPriceGreaterThanBalance { get; set; } = true;
     }
 }

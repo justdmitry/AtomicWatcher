@@ -58,7 +58,7 @@
                 foreach (var sale in sales)
                 {
                     var eb = new EmbedBuilder()
-                        .WithAuthor($"{sale.Name} (№{sale.CardId})", sale.Rarity?.GetRarityIcon())
+                        .WithAuthor($"{sale.Name} (№{sale.TemplateId})", sale.Rarity?.GetRarityIcon())
                         .WithColor(sale.Rarity.GetRarityDiscordColor())
                         .WithTimestamp(sale.Created)
                         .WithFooter("Made with ♥ and potassium");
@@ -66,8 +66,8 @@
                     eb.AddField("Price", $"[{sale.Price} WAX]({sale.Link})", true);
                     eb.AddField("Mint", $"{sale.Mint} / {sale.IssuedSupply} (max {sale.MaxSupply})");
 
-                    var template = templates.FirstOrDefault(x => x.CardId == sale.CardId);
-                    if (template != null)
+                    var template = templates.FirstOrDefault(x => x.Id == sale.TemplateId);
+                    if (template != null && !string.IsNullOrEmpty(template.Image))
                     {
                         eb.WithThumbnailUrl(template.Image);
                     }

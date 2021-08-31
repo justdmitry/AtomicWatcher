@@ -58,7 +58,7 @@
                     break;
                 }
 
-                logger.LogDebug($"Analyzing sale {sale.Id} of №{sale.CardId} {sale.Name} (mint {sale.Mint}, template {sale.TemplateId})...");
+                logger.LogDebug($"Analyzing sale {sale.Id} of №{sale.TemplateId} {sale.Name} (mint {sale.Mint}, template {sale.TemplateId})...");
 
                 queue.Clear();
                 foreach (var acc in accounts)
@@ -77,14 +77,14 @@
                     var ignoreRule = rules.Where(x => x.Ignore).FirstOrDefault(x => Matches(x, sale, mint));
                     if (ignoreRule != null)
                     {
-                        logger.LogDebug($"Account '{acc.Id}' has 'ignore' rule {ignoreRule.Id} for card {sale.CardId} ({sale.Name}), #{sale.Mint}");
+                        logger.LogDebug($"Account '{acc.Id}' has 'ignore' rule {ignoreRule.Id} for card {sale.TemplateId} ({sale.Name}), #{sale.Mint}");
                         continue;
                     }
 
                     var acceptRule = rules.Where(x => !x.Ignore).FirstOrDefault(x => Matches(x, sale, mint));
                     if (acceptRule != null)
                     {
-                        logger.LogDebug($"Account '{acc.Id}' has 'notify' rule {acceptRule.Id} for card {sale.CardId} ({sale.Name}), #{sale.Mint}, will notify");
+                        logger.LogDebug($"Account '{acc.Id}' has 'notify' rule {acceptRule.Id} for card {sale.TemplateId} ({sale.Name}), #{sale.Mint}, will notify");
                         queue.Add((acc, mint));
                         continue;
                     }
@@ -110,7 +110,7 @@
                     continue;
                 }
 
-                var text = $@"№{sale.CardId} {sale.Rarity?.GetRaritySymbol()} <b>{sale.Name}</b>
+                var text = $@"№{sale.TemplateId} {sale.Rarity?.GetRaritySymbol()} <b>{sale.Name}</b>
 Mint {sale.Mint} (you have {(acc.existingMint.HasValue ? acc.existingMint : "-NONE-")})
 <a href='{sale.Link}'>For <b>{sale.Price}</b> WAX</a> by {sale.Seller}";
                 var msg = new SendMessage(acc.account.TelegramId, text) { ParseMode = SendMessage.ParseModeEnum.HTML, DisableWebPagePreview = true };
@@ -125,12 +125,12 @@ Mint {sale.Mint} (you have {(acc.existingMint.HasValue ? acc.existingMint : "-NO
                 return false;
             }
 
-            if (rule.MinCardId.HasValue && sale.CardId < rule.MinCardId)
+            if (rule.MinTemplate.HasValue && sale.TemplateId < rule.MinTemplate)
             {
                 return false;
             }
 
-            if (rule.MaxCardId.HasValue && sale.CardId > rule.MaxCardId)
+            if (rule.MaxTemplate.HasValue && sale.TemplateId > rule.MaxTemplate)
             {
                 return false;
             }

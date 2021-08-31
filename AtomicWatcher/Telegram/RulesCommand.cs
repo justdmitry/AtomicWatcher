@@ -77,12 +77,12 @@
                         ? null
                         : $"rarity = {rule.Rarity}";
 
-                    var ruleCard = (rule.MinCardId, rule.MaxCardId) switch
+                    var ruleTempalte = (rule.MinTemplate, rule.MaxTemplate) switch
                     {
                         (null, null) => null,
-                        (null, _) => $"card <= {rule.MaxCardId}",
-                        (_, null) => $"card >= {rule.MinCardId}",
-                        (_, _) => rule.MinCardId == rule.MaxCardId ? $"card = {rule.MaxCardId}" : $"card {rule.MinCardId}…{rule.MaxCardId}",
+                        (null, _) => $"template <= {rule.MaxTemplate}",
+                        (_, null) => $"template >= {rule.MinTemplate}",
+                        (_, _) => rule.MinTemplate == rule.MaxTemplate ? $"template = {rule.MinTemplate}" : $"template {rule.MinTemplate}…{rule.MaxTemplate}",
                     };
 
                     var ruleMint = (rule.MinMint, rule.MaxMint) switch
@@ -107,7 +107,7 @@
                     sb.Append(counter);
                     sb.Append(". ");
                     sb.Append(rule.Ignore ? "*IGNORE* " : "*Notify* ");
-                    sb.AppendLine(string.Join(", ", new[] { ruleAbsent, ruleLowerMint, ruleRarity, ruleCard, ruleMint, rulePrice }.Where(x => x != null)));
+                    sb.AppendLine(string.Join(", ", new[] { ruleAbsent, ruleLowerMint, ruleRarity, ruleTempalte, ruleMint, rulePrice }.Where(x => x != null)));
                     sb.AppendLine($"    delete: /rules\\_del\\_{rule.Id}");
                 }
 
@@ -248,12 +248,12 @@
 
                         switch (subparts[0])
                         {
-                            case "min-card":
-                                rule.MinCardId = intValue;
+                            case "min-template":
+                                rule.MinTemplate = intValue;
                                 looksGood = true;
                                 continue;
-                            case "max-card":
-                                rule.MaxCardId = intValue;
+                            case "max-template":
+                                rule.MaxTemplate = intValue;
                                 looksGood = true;
                                 continue;
                             case "min-mint":
